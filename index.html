@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>My Neighbourhood Map</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="">
+  <meta name="author" content="">
+    <link rel="stylesheet" href="css/bootstrap.min.css">
+    <link rel="stylesheet" href="css/style.css">
+   
+ </head>
+<body>
+<div class="container-fluid">
+	<div class="row">
+		<div class="col-md-2">
+    <span style="font-size:30px;cursor:pointer" onclick="openNav()">&#9776; The 7 Wonders of the World</span>
+             <div id="mySidenav" class="sidenav">
+                <a href="javascript:void(0)" class="closebtn" onclick="closeNav()">&times;</a>
+                <a>7 WONDERS</a>
+                <input placeholder=" Search WONDERS" type="search" data-bind="value: searchQuery, valueUpdate: 'input'" autocomplete="on">
+            <ul id="locationList" data-bind="foreach: locations">
+                <div data-bind="if: isFiltered">
+                    <li data-bind="text: title, click: $parent.toggleMarker"></li>
+                </div>
+            </ul>
+        </div>
+        </div>
+
+
+
+
+		<div class="col-md-10" id="map">
+	</div>
+
+   <header class="title">
+      <p class="title1 text-left">The Wonders</p>
+      <p class="text-right"><span> -Smitul Soni</span></p>
+    </header>
+
+</body>
+
+
+<script>
+function openNav() {
+    document.getElementById("mySidenav").style.width = "300px";
+}
+
+function closeNav() {
+    document.getElementById("mySidenav").style.width = "0";
+}
+</script>
+<script type="text/javascript" src="js/knockout-3.4.0.js"></script>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/2.2.0/jquery.min.js"></script>
+<script type="text/javascript" src="js/main.js"></script>
+<script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBiDX_9k6dZjbyIw_t3HLK5njUX8L6MIM0&callback=initMap" onerror="myerrorhandler()" async defer></script>
+</body>
+</html>
