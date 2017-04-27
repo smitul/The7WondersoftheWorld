@@ -1,214 +1,205 @@
-var myerrorhandler = function(){
-     alert("Error connecting to Google Maps");
-}
 
-var map;
-//Code for Displaying Map
-var initMap = function () {
+var newMap;
+//Function for handling errors.
+var mapError = function(){
+    alert("Google Maps Error");
+};
+//initial display of the map
+var initializeMap = function () {
     try {
-        map = new google.maps.Map(document.getElementById('map'), {
+        newMap = new google.maps.Map(document.getElementById('myMap'), {
             zoom: 2,
-            center: new google.maps.LatLng(24.8957746, 67.0770452),
-            mapTypeId: google.maps.MapTypeId.ROADMAP
+            center: new google.maps.LatLng(24.8957746, 67.0770452),         //defines the center for display
         });
-        
-        viewModel.init();
+        vm.initialize();
     }
     catch (error) {
-        alert("Error connecting to Google Maps! Error: " + error);
+        alert("Google maps error");
     }
 };
+var vm = {
+    //function for filtering the searched items
+    filterItem: function () {
+        var filtered = vm.searchQuery().toLowerCase();
 
+        for (var i = 0; i < viewModel.wonders.length; i++) {
 
-var viewModel = {
+            var searched = viewModel.wonders[i].title().toLowerCase();
 
-    self: this,
-    locations: ko.observableArray(),
-
-    // variable used for searching
-    searchQuery: ko.observable(''),
-
-    //method called by KO list item from index.html when the list item is clicked
-    
-    toggleMarker: function (location) {
-        viewModel.disableMarkers();
-        location.marker.setAnimation(google.maps.Animation.BOUNCE);
-        location.infowindow.open(map, location.marker);
-    },
-
-    //disable marker
-        disableMarkers: function () {
-        for (var i = 0; i < this.locations().length; i++) {
-            this.locations()[i].marker.setAnimation(null);
-            this.locations()[i].infowindow.close();
-        }
-    },
-
-    //Get Loacations
-    fillLocations: function () {
-        for (var i = 0; i < model.locations.length; i++) {
-            this.locations.push(model.locations[i]);
-        }
-    },
-
-    
-    init: function () {
-        model.init();
-        this.fillLocations();
-        ko.applyBindings(viewModel);
-        viewModel.searchQuery.subscribe(this.filterItems);
-    },
-
-    
-    filterItems: function () {
-        var filter = viewModel.searchQuery().toLowerCase();
-
-        for (var i = 0; i < model.locations.length; i++) {
-
-            var searchedTitle = model.locations[i].title().toLowerCase();
-
-            if (searchedTitle.indexOf(filter) > -1) {
-                model.locations[i].isFiltered(true);
-                model.locations[i].marker.setMap(map);
+            if (searched.indexOf(filtered) > -1) {
+                viewModel.wonders[i].isFiltered(true);
+                viewModel.wonders[i].marker.setMap(newMap);
             }
             else {
-                model.locations[i].isFiltered(false);
-                model.locations[i].marker.setMap(null);
+                viewModel.wonders[i].isFiltered(false);
+                viewModel.wonders[i].marker.setMap(null);
             }
         }
-    }
-};
-
-//The wonders are listed in this variable
-var model = {
+    },
+    //function for making the marker bounce
+    markerToggle: function(loc){
+        vm.disableAllMarkers();
+        loc.marker.setAnimation(google.maps.Animation.BOUNCE);
+        loc.infowindow.open(newMap, loc.marker);
+    },
+    //function for disabling the markers
+    disableAllMarkers: function () {
+        for (var i = 0; i < this.wonders().length; i++) {
+            this.wonders()[i].marker.setAnimation(null);
+            this.wonders()[i].infowindow.close();
+        }
+    },
+    //function for adding the wonders of the world to the array
+    fillWonders: function () {
+        for (var i = 0; i < viewModel.wonders.length; i++) {
+            this.wonders.push(viewModel.wonders[i]);
+        }
+    },
+    searchQuery: ko.observable(''),
     self: this,
-    locations: [
+    initialize: function () {
+        viewModel.initialize();
+        this.fillWonders();
+        ko.applyBindings(vm);
+        vm.searchQuery.subscribe(this.filterItem);
+    },
+    wonders: ko.observableArray()
+};
+var viewModel = 
+{
+    //the list of the 7 wonders of the world with their positions on the map represented in coordinates
+    wonders: [
         {
-            title: ko.observable("Great Wall of China"),
-            lat: 40.4321,
-            lng: 116.5703,
             isFiltered: ko.observable(true),
-            Url:"https://en.wikipedia.org/wiki/Great_Wall_of_China"
+            latitude: 40.4321,
+            longitude: 116.5703,
+            title: ko.observable("Great Wall of China"),
+            Url:"https://en.wikipedia.org/wiki/Great_Wall_of_China"     //url for redirecting information from wikipedia
         },
         {
-            title: ko.observable("Taj Mahal"),
-            lat: 27.1752,
-            lng: 78.0421,
             isFiltered: ko.observable(true),
+            latitude: 27.1752,
+            longitude: 78.0421,
+            title: ko.observable("Taj Mahal"),
             Url:"https://en.wikipedia.org/wiki/Taj_Mahal"
         },
         {
-            title: ko.observable("Great Pyramid of Giza"),
-            lat: 29.9795,
-            lng: 31.1342,
             isFiltered: ko.observable(true),
+            latitude: 29.9795,
+            longitude: 31.1342,
+            title: ko.observable("Great Pyramid of Giza"),
             Url:"https://en.wikipedia.org/wiki/Great_Pyramid_of_Giza"
         },
         {
-            title: ko.observable("Colosseum"),
-            lat: 41.8904,
-            lng: 12.4922,
             isFiltered: ko.observable(true),
+            latitude: 41.8904,
+            longitude: 12.4922,
+            title: ko.observable("Colosseum"),
             Url:"https://en.wikipedia.org/wiki/Colosseum"
         },
         {
-            title: ko.observable("Machu Picchu"),
-            lat: -13.1628,
-            lng: -72.5449,
             isFiltered: ko.observable(true),
+            latitude: -13.1628,
+            longitude: -72.5449,
+            title: ko.observable("Machu Picchu"),
             Url:"https://en.wikipedia.org/wiki/Machu_Picchu"
         },
         {
-            title: ko.observable("Statue of Zeus"),
-            lat: 38.1002,
-            lng: 21.5833,
             isFiltered: ko.observable(true),
+            latitude: 38.1002,
+            longitude: 21.5833,
+            title: ko.observable("Statue of Zeus"),
             Url:"https://en.wikipedia.org/wiki/Statue_of_Zeus_at_Olympia"
         },
         {
-            title: ko.observable("Hanging Gardens of Babylon"),
-            lat: 32.5424,
-            lng: 44.4210,
             isFiltered: ko.observable(true),
+            latitude: 32.5424,
+            longitude: 44.4210,
+            title: ko.observable("Hanging Gardens of Babylon"),
             Url:"https://en.wikipedia.org/wiki/Hanging_Gardens_of_Babylon"
         }
 
     ],
-   //adds wikipedia content to the model 
-    setContent: function () {
-        for (var i = 0; i < this.locations.length; i++) {
-            var wikiURL = "https://en.wikipedia.org/w/api.php?format=json&action=query&prop=extracts&exintro=&explaintext=&titles=" + this.locations[i].title();
-            var wikiRequestTimeout = setTimeout(function () {
-                article = "Wiki resources not available";
+    self: this,
+    //function to create marker at the defined point
+    createMarker: function (loc) {
+        var marker = new google.maps.Marker({
+            position: new google.maps.LatLng(loc.latitude, loc.longitude),
+            map: newMap,
+            title: loc.title()
+        });
+        //event on click added to make the marker bounce after the click only
+        marker.addListener('click', function () {
+            viewModel.markerBounce(location);
+            loc.infowindow.open(newMap, marker);
+        });
+        return marker;
+    },
+     initialize: function () {
+        this.addMarkers();
+        this.setInfo();
+    },
+    addMarkers: function () {
+        for (var i = 0; i < this.wonders.length; i++) {
+            this.wonders[i].marker = this.createMarker(this.wonders[i], i);
+        }
+    },
+     markerBounce: function (loc) {
+        vm.disableAllMarkers();
+        loc.marker.setAnimation(google.maps.Animation.BOUNCE);
+    },
+    //function to take information from wikipedia using wikipedia API
+    setInfo: function () 
+    {
+        for (var i = 0; i < this.wonders.length; i++) 
+        {
+            var wikipediaURL = "https://en.wikipedia.org/w/api.php?format=json&action=query&prop=extracts&exintro=&explaintext=&titles=" + this.wonders[i].title();
+            var wikipediaRequestTimeout = setTimeout(function () {
                 alert("Wiki resources not available");
-
-            }, 8000);
-            var article = getWikiExtract(i, wikiRequestTimeout, wikiURL);
-
-            function getWikiExtract(i, wikiRequestTimeout, wikiURL) {
-                var result = '';
-                $.ajax({
-                    url: wikiURL,
+            }, 6000);
+            var article = getWikiExtract(i, wikipediaRequestTimeout, wikipediaURL);
+            function getWikiExtract(i, wikipediaRequestTimeout, wikipediaURL) 
+            {
+                var content = '';
+                $.ajax(
+                {
+                    url: wikipediaURL,
                     dataType: "jsonp"
-                }).done(function (data) {
-                    if (data && data.query && data.query.pages) {
+                }   ).done(function (data) 
+                {
+                    if (data && data.query && data.query.pages) 
+                    {
                         var pages = data.query.pages;
                     }
                     
-                    else {
-                        result = "No wiki page found!";
-                        model.locations[i].infowindow = new google.maps.InfoWindow({
-                            content: model.locations[i].title() + "<br><br>" + "Wikipedia info:" + "<br>" + result
+                    else 
+                    {
+                        content = "No content available";
+                        viewModel.wonders[i].infowindow = new google.maps.InfoWindow(
+                        {
+                            content: viewModel.wonders[i].title() + "<br>" + "Wikipedia content : " + "<br>" + content
                         })
                     }
-                    for (var id in pages) {
-                        result = pages[id].extract;
-                        model.locations[i].infowindow = new google.maps.InfoWindow({
-                            content: '<div class="infoWindow"' + '<strong><b>' + model.locations[i].title() + '</b></strong>' + '<br><br>' + "Wikipedia info:" + '<br>' + result + '</div>',
-                            maxWidth: '300'
+                    for (var page in pages) 
+                    {
+                        content = pages[page].extract;
+                        viewModel.wonders[i].infowindow = new google.maps.InfoWindow(
+                        {
+                            content: '<div class="infoWindow"' + '<b>' + model.wonders[i].title() + '</b>' + '<br>' + "Wikipedia content : " + '<br>' + content + '</div>'
                         })
                     }
-                    clearTimeout(wikiRequestTimeout);
-                }).fail(function () {
+                    clearTimeout(wikipediaRequestTimeout);
+                }   ).fail(function () 
+                {
                     alert("Wikipedia unreachable!");
-                    model.locations[i].infowindow = new google.maps.InfoWindow({
-                        content: model.locations[i].title() + "<br><br>" + "Wikipedia info:" + "<br>" + "Unavailable"
+                    viewModel.wonders[i].infowindow = new google.maps.InfoWindow(
+                    {
+                        content: viewModel.wonders[i].title() + "<br>" + "Wikipedia content Unavailable"
                     })
                 })
             }
         }
-    },
-
-    //creates a marker for each location.
-    addMarkers: function () {
-        for (var i = 0; i < this.locations.length; i++) {
-            this.locations[i].marker = this.createMarker(this.locations[i], i);
-        }
-    },
-
-    //Add animation to marker
-    toggleBounce: function (location) {
-        viewModel.disableMarkers();
-        location.marker.setAnimation(google.maps.Animation.BOUNCE);
-    },
-
-    //create marker
-    createMarker: function (location) {
-        var marker = new google.maps.Marker({
-            title: location.title(),
-            map: map,
-            animation: google.maps.Animation.DROP,
-            position: new google.maps.LatLng(location.lat, location.lng)
-        });
-        marker.addListener('click', function () {
-            model.toggleBounce(location);
-            location.infowindow.open(map, marker);
-        });
-        return marker;
-    },
-
-        init: function () {
-        this.addMarkers();
-        this.setContent();
     }
+    
+        
 };
